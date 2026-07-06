@@ -1,0 +1,98 @@
+# =============================================================================
+# FASE 5: DESPLIEGUE DE LA APLICACIÓN DE BLOG EN KUBERNETES (AKS)
+# =============================================================================
+- name: Desplegar app persistente en AKS
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    # acr_login se inyecta desde tu ejecutar_todo_maestro.sh
+    app_image: "{{ acr_login }}/web-blog-santi:casopractico2"
+    app_name: "blog-santi"
+    pvc_size: "1Gi"
+    storage_class: "managed-csi" # La StorageClass recomendada para Azure Disk CSI
+
+  tasks:
+    # --- 1) PVC: Petición de almacenamiento persistente (Criterio 4) -----------
+    - name: Crear el PersistentVolumeClaim
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: blog-pvc
+            namespace: default
+            labels: { fase: fase5-k8s }
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            storageClassName: "{{ storage_class }}"
+            resources:
+              requests:
+                storage: "{{ pvc_size }}"
+
+    # --- 2) Deployment: Tu app de Blog montando el volumen --------------------
+    - name: Crear el Deployment
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: blog-deployment
+            namespace: default
+            labels: { app: "{{ app_name }}", fase: fase5-k8s }
+          spec:
+            replicas: 2 # Mantenemos tus 2 réplicas para el balanceo
+            selector:
+              matchLabels: { app: "{{ app_name }}" }
+            template:
+              metadata:
+                labels: { app: "{{ app_name }}" }
+              spec:
+                containers:
+                  - name: blog-container
+                    image: "{{ app_image }}"
+                    ports:
+                      - containerPort: 8080
+                    volumeMounts:
+                      - name: blog-datos-persistentes
+                        mountPath: "/data" # Ruta interna donde tu app guarda posts.txt
+                volumes:
+                  - name: blog-datos-persistentes
+                    persistentVolumeClaim:
+                      claimName: blog-pvc
+
+    # --- 3) Service LoadBalancer: Exponer a Internet --------------------------
+    - name: Crear el Service LoadBalancer
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: blog-servicio-publico
+            namespace: default
+            labels: { fase: fase5-k8s }
+          spec:
+            type: LoadBalancer
+            selector: { app: "{{ app_name }}" }
+            ports:
+              - port: 80
+                targetPort: 8080
+
+    # --- 4) Esperar a Azure y obtener la IP automática
+    - name: Esperar a que Azure asigne la IP pública al Service
+      kubernetes.core.k8s_info:
+        kind: Service
+        name: blog-servicio-publico
+        namespace: default
+      register: svc_info
+      until: svc_info.resources[0].status.loadBalancer.ingress is defined
+      retries: 20
+      delay: 10
+
+    - name: Mostrar IP Pública de tu Blog
+      ansible.builtin.debug:
+        msg: "Tu aplicación de Blog está lista en: http://{{ svc_info.resources[0].status.loadBalancer.ingress[0].ip }}"

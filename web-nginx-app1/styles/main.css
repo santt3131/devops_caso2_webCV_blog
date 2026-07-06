@@ -1,0 +1,279 @@
+body {
+	color: white;
+	background-color: #18171c;
+	margin: 1em 3em;
+	font-size: 18px;
+	font-family: "Open Sans", "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+		"Helvetica Neue", sans-serif;
+}
+
+/*********CABECERA*********/
+.photo {
+	text-align: center;
+}
+
+.photo__item {
+	clip-path: circle(40%);
+}
+
+.info-title {
+	display: flex;
+	margin: auto;
+}
+
+.photo,
+.additionals {
+	width: 40%;
+}
+
+.title,
+.professional {
+	width: 60%;
+}
+
+.aboutme {
+	margin: 0 0 2em 0;
+	text-align: justify;
+}
+
+.title > * {
+	text-align: center;
+}
+
+.title__h1 {
+	margin: 0px;
+}
+
+/*********BODY*********/
+
+.title {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.title__item {
+	text-align: center;
+	font-size: 1.2em;
+}
+
+main {
+	display: flex;
+}
+
+.logo {
+	list-style: none;
+	display: flex;
+}
+
+.logo__item {
+	width: 50%;
+	text-align: center;
+}
+
+.box__title {
+	font-weight: 800;
+}
+
+.contact__item,
+.box__body,
+.box__item {
+	font-weight: 300;
+}
+
+/*Cursos*/
+.box__item {
+	display: flex;
+}
+
+.box__item > span:first-child {
+	width: 70%;
+}
+
+.box__item > span:last-child {
+	width: 30%;
+	text-align: center;
+}
+
+/********************PROFESIONAL*********************/
+.professional {
+	color: #18171c;
+	background-color: #eeeeee;
+	padding: 0 1em;
+}
+
+.additionals {
+	padding: 0 1em;
+}
+
+/*experience*/
+
+.tasklist__title {
+	font-weight: 800;
+	font-size: 1.5em;
+}
+
+.tasklist {
+	margin-top: 1em;
+}
+.tasklist__subtitle {
+	font-weight: 600;
+	display: flex;
+	font-size: 1em;
+}
+
+/*EDUCATION*/
+.box__title {
+	display: flex;
+}
+
+.box__title > span:first-child {
+	width: 70%;
+}
+
+.box__title > span:last-child {
+	width: 30%;
+	text-align: center;
+}
+
+/*JOB POSITIONS*/
+.tasklist__subtitle div:first-child {
+	width: 70%;
+}
+
+.tasklist__subtitle div:nth-child(2) {
+	width: 30%;
+}
+
+.taskbody {
+	list-style: none;
+	padding-left: 0;
+}
+
+.taskbody__item:before {
+	content: "✓ ";
+}
+
+.taskbody {
+	margin-left: 1em;
+}
+
+/*footer,mail and mobile*/
+.title a,
+.footer a {
+	text-decoration: none;
+}
+
+.title a:link,
+.footer a:link {
+	color: white;
+}
+
+.title a:visited,
+.footer a:visited {
+	color: green;
+}
+
+.title a:hover,
+.footer a:visited {
+	color: lightblue;
+}
+
+.footer img {
+	width: 60px;
+	height: 20px;
+}
+
+/*arrow*/
+.button-up {
+	font-size: 16px;
+	text-transform: uppercase;
+	font-weight: bold;
+	color: white;
+	text-decoration: none;
+	border-radius: 5px;
+	letter-spacing: 2px;
+	background-color: #0e76a8;
+	padding: 16px 22px;
+	position: fixed;
+	display: none;
+	bottom: 40px;
+	right: 40px;
+	transition: all 300ms ease 0ms;
+	z-index: 2;
+}
+
+.button-up:hover {
+	background-color: #0060d0;
+	transform: translateY(-6px);
+}
+
+#top {
+	display: none;
+}
+
+/*MOBILE*/
+@media (min-width: 320px) and (max-width: 767px) {
+	body {
+		font-size: 15px;
+		margin: 1.2em 2em;
+	}
+
+	.photo,
+	.title,
+	.title,
+	.professional {
+		width: 100%;
+	}
+
+	/*HEADER*/
+	.info-title {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.aboutme {
+		margin: 2em 0;
+	}
+
+	/*MAIN*/
+	main {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.professional {
+		order: 1;
+		width: 92%;
+	}
+
+	.additionals {
+		order: 2;
+		width: 92%;
+	}
+
+	/*YEAR*/
+	.tasklist__subtitle div:first-child {
+		flex: 0 1 55%;
+	}
+
+	.tasklist__subtitle div:nth-child(2) {
+		flex: 0 1 45%;
+	}
+
+	.tasklist__proyect {
+		margin-top: 0.5em;
+	}
+
+	#top {
+		display: none;
+	}
+
+	.button-up {
+		font-size: 14px;
+		padding: 12px 20px;
+		bottom: 20px;
+		right: 20px;
+	}
+}

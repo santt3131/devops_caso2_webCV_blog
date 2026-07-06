@@ -1,0 +1,16 @@
+# --- Secretos y Claves Locales (SEGURIDAD) ---
+.vault_pass
+
+
+# Estado Local de Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# Ansible Variables Dinámicas
+ansible/group_vars/all.yml
+ansible/hosts
+
+# Ignorar archivos del sistema operativo
+.DS_Store

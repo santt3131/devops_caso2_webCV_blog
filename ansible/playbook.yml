@@ -1,0 +1,55 @@
+---
+# =============================================================================
+# PLAYBOOK DE ANSIBLE - CONFIGURACIÓN DE ENTORNO
+# =============================================================================
+- name: "Configuración declarativa de la Máquina Virtual para el Caso Práctico 2"
+  hosts: azure_vms
+  become: yes
+  gather_facts: true
+
+  tasks:
+    # -------------------------------------------------------------
+    # 1. INSTALACIÓN Y CONFIGURACIÓN DE PAQUETES
+    # -------------------------------------------------------------
+    - name: "1. Asegurar la presencia del paquete Podman en el sistema"
+      package: #versión larga: ansible.builtin.apt
+        name: podman
+        state: present
+        update_cache: yes
+
+    - name: "2. Login en el ACR usando variables dinámicas"
+      containers.podman.podman_login:
+        registry: "{{ acr_login_server }}"
+        username: "{{ acr_username }}"
+        password: "{{ acr_password }}"
+
+    - name: "3. Descargar (Pull) la imagen explícitamente desde el ACR"
+      containers.podman.podman_image:
+        name: "{{ acr_login_server }}/repo-santi:casopractico2"
+        pull: yes
+
+    # -------------------------------------------------------------
+    # 2. DESPLIEGUE DEL CONTENEDOR E INTEGRACIÓN CON SYSTEMD
+    # -------------------------------------------------------------
+    - name: "4. Levantar el contenedor y generar la unidad Systemd de forma limpia"
+      containers.podman.podman_container:
+        name: "web-app-podman"
+        image: "{{ acr_login_server }}/repo-santi:casopractico2"
+        state: started
+        ports:
+          - "443:443"
+        generate_systemd:
+          path: /etc/systemd/system
+          restart_policy: always
+          names: true
+          new: true
+
+    - name: "5. Recargar el demonio de systemd"
+      systemd: # versión larga: ansible.builtin.systemd_service
+        daemon_reload: yes
+
+    - name: "6. Habilitar y arrancar el servicio para persistencia tras reinicios"
+      systemd: # versión larga: ansible.builtin.systemd_service
+        name: "container-web-app-podman.service"
+        enabled: yes
+        state: started
